@@ -12,13 +12,6 @@ function LCDClear()
     hardware.uart12.write(0x01);
     hardware.uart12.write(254);
     hardware.uart12.write(128);
-    LCDBoxCursorOff();
-}
-
-function LCDBoxCursorOff()
-{
-    hardware.uart12.write(254);
-    hardware.uart12.write(0x0C);
 }
 
 function LCDWriteMessage(LCDMessage)
