@@ -1,5 +1,6 @@
 // Code below this line is for your node.
 // Drive 3.3v LCD Screen using a Sparkfun SerLCD backpack from an Electric IMP
+//Taken from http://www.instructables.com/id/Wiring-and-programming-an-Electric-Imp-with-an-LCD/
 
 hardware.uart12.configure(9600, 8, PARITY_NONE, 1, NO_RX);
 
