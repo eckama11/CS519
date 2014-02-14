@@ -10,3 +10,7 @@ The electric imp website can be found at
 
 https://electricimp.com/
 
+Most of the parts are from the following website
+
+https://www.sparkfun.com/ 
+
