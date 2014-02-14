@@ -3,18 +3,19 @@ function readTandH(){
     local alsAddr = 0x40;
     hardware.i2c89.write(alsAddr<<1,"\xf3");
     imp.sleep(10);
-    local temp = hardware.i2c89.read(alsAddr<<1, "", 3);
+    local a = hardware.i2c89.read(alsAddr<<1, "", 3);
     hardware.i2c89.write(alsAddr<<1,"\xf5");
     imp.sleep(10);
-    local hum = hardware.i2c89.read(alsAddr<<1, "", 3);
+    local b = hardware.i2c89.read(alsAddr<<1, "", 3);
     //server.log(format("Temp read: %02x %02x %02x", temp[0], temp[1], temp[2]));
     //server.log(format("Hum read: %02x %02x %02x", hum[0], hum[1], hum[2]));
-    temp = ((temp[0] <<8) + (temp[1] & 0xfc));
-    hum = ((hum[0] <<8) + (hum[1] & 0xf0));
-    temp = -46.85 + (175.72(temp/65536.00); 
-    hum = -6 + (125(hum/65536.00));
-    server.log("temp" + temp);
-    server.log("hum" + hum);
+    local temp = ((a[0] <<8) + (a[1] & 0xfc)) * 1.0;
+    local hum = ((b[0] <<8) + (b[1] & 0xf0)) * 1.0;
+    local newTemp = (-46.85 + (175.72 * (temp/65536.00)));
+    local newHum = -6 + (125 * (hum/65536.00));
+    newTemp = newTemp * 1.8 + 32;
+    server.log("Temp: " + newTemp);
+    server.log("Hum: " + newHum);
 }
 
 function bigLoop() { 
