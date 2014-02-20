@@ -1,25 +1,25 @@
 //Code below is for GPS P6H0171327 
 //GTPA013 
-
+gpsline<-"";
 function gpsData() {
-    local coor = hardware.uart57.read();
-    imp.sleep(1);
-    server.log(coor + " coor");
+    local b = hardware.uart57.read();
+  while(b != -1) {
+    if (b < 32) {
+      if (gpsline.len() > 0) server.log("GPS line: "+gpsline);
+      gpsline="";
+    } else {
+      gpsline += b.tochar();
+    }
+    b=hardware.uart57.read();
+  }
 }
 
 //Main Execution loop
 function loop() {
   //configure hardware
   hardware.uart57.configure(9600, 8, PARITY_NONE, 1, NO_CTSRTS, gpsData);
-  
-  //proof program is working
-  server.log("Device Started");
-  
-  //do stuff
+  //read out gps data
   gpsData();
-  
-  //Loop Activities - executed once every Wakeup
-  imp.wakeup(5.0, loop);
 }
 
 //Pause 5 Seconds before starting the main loop - adjust to taste
