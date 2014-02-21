@@ -1,8 +1,9 @@
 //Code below is for GPS P6H0171327 
-//GTPA013 
+//GTPA013 with pins5,7
 gpsline<-"";
 function gpsData() {
     local b = hardware.uart57.read();
+
   while(b != -1) {
     if (b < 32) {
       if (gpsline.len() > 0) server.log("GPS line: "+gpsline);
@@ -19,8 +20,8 @@ function loop() {
   //configure hardware
   hardware.uart57.configure(9600, 8, PARITY_NONE, 1, NO_CTSRTS, gpsData);
   //read out gps data
-  gpsData();
 }
 
 //Pause 5 Seconds before starting the main loop - adjust to taste
+server.log("Device On");
 imp.wakeup(5.0, loop);
