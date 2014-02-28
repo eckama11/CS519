@@ -1,0 +1,60 @@
+//configure htu21D
+hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
+//configure LCD
+hardware.uart12.configure(9600, 8, PARITY_NONE, 1, NO_RX);
+//clear LCD
+hardware.uart12.write(254);
+hardware.uart12.write(0x01);
+hardware.uart12.write(254);  
+hardware.uart12.write(128);
+
+function readTandH(){
+    //get ready to read hum and temp
+    local alsAddr = 0x40;
+    hardware.i2c89.write(alsAddr<<1,"\xf3");
+    //give time to transfer
+    imp.sleep(5);
+    local a = hardware.i2c89.read(alsAddr<<1, "", 3);
+    hardware.i2c89.write(alsAddr<<1,"\xf5");
+    //give time to transfer
+    imp.sleep(5);
+    local b = hardware.i2c89.read(alsAddr<<1, "", 3);
+    //server.log(format("Temp read: %02x %02x %02x", temp[0], temp[1], temp[2]));
+    //server.log(format("Hum read: %02x %02x %02x", hum[0], hum[1], hum[2]));
+    //shifting bytes over
+    local temp = ((a[0] <<8) + (a[1] & 0xfc)) * 1.0;
+    local hum = ((b[0] <<8) + (b[1] & 0xf0)) * 1.0;
+    //as per the breakout board docs formula to take int to temp and hum
+    local newTemp = (-46.85 + (175.72 * (temp/65536.00)));
+    local newHum = -6 + (125 * (hum/65536.00));
+    //convert to farenheit
+    newTemp = newTemp * 1.8 + 32;
+    //make string
+    newTemp = "" + newTemp;
+    newHum = "" + newHum;
+    //current lcd has 16 characters on 2 lines
+    //making 32 total want temp on first line
+    //hum on second
+    local leng = newTemp.len();
+    local makeLine = 10 - leng;
+    local space = " ";
+    while(makeLine > space.len()) {
+      space = space + " ";
+    }
+    server.log("Length: " + leng);
+    server.log("Temp: " + newTemp);
+    server.log("Hum: " + newHum);
+    //clear lcd so it doesn't concat
+    hardware.uart12.write(254);
+    hardware.uart12.write(0x01);
+    hardware.uart12.write(254);  
+    hardware.uart12.write(128);
+    hardware.uart12.write("Temp: " + newTemp + space + "Hum: " + newHum);
+}
+
+function bigLoop() {
+  readTandH();
+  imp.wakeup(5, bigLoop); // sleep for 10 seconds
+}
+
+bigLoop();
