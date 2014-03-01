@@ -1,0 +1,17 @@
+function requestHandler(request, response) {
+  try {
+    // check if the user sent lcd as a query parameter
+    if ("LCD" in request.query) {
+        local lcdState = request.query.LCD.tostring();
+        // send "lcd" message to device, and send lcdState as the data
+        device.send("lcd", lcdState); 
+    }
+    // send a response back saying everything was OK.
+    response.send(200, "OK");
+  } catch (ex) {
+    response.send(500, "Internal Server Error: " + ex);
+  }
+}
+ 
+// register the HTTP handler
+http.onrequest(requestHandler);
