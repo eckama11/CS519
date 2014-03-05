@@ -1,0 +1,41 @@
+hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
+
+function readPressureInchesGH() {
+  local a = (0x5d << 1);
+  local press = hardware.i2c89.read(a, "\x28", 3);
+  local pressure = (press[0] << 16) + (press[1] << 8) + (press[2]);
+  //2's compliment if the number is negative
+  if (0x800000 & pressure) pressure = -(0x1000000-pressure);
+  pressure = pressure/4096;
+  return pressure;
+}
+
+function readTemperatureF() {
+  local a = (0x5d << 1);
+  local t = hardware.i2c89.read(a, "\x2B", 2);
+  local temp = (t[0] << 8) + (t[1]);
+  temp = 42.5 + (temp/480) ; 
+  //convert to Farenheit
+  temp = (9/5)*(temp + 32);
+  return temp;
+}
+
+//function to read pressure, altitude, temp
+function readPAT() {
+  //need to turn device on
+  hardware.i2c89.write(0x5d << 1,"\x20\xe0");
+  //wait .5 seconds
+  imp.sleep(0.5);
+  //do work of getting pressure
+  local pressureA = readPressureInchesGH();
+  //do work of getting altitude
+  //local altitude = pressureToAltitudeFeet(pressureA);
+  //do work of getting temperature
+  local temperature = readTemperatureF();
+  //log pressure, altitude, temp to server.log
+  server.log("pressure: " + pressureA + " inHG");
+  server.log("altitude: " + altitude + " ft");
+  server.log("temperature: " + temperature + " deg F");
+}
+ 
+readPAT();
