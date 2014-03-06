@@ -10,6 +10,19 @@ function readPressureInchesGH() {
   return pressure;
 }
 
+// converts pressure in mbar to altitude in meters, using 1976 US
+// Standard Atmosphere model (note that this formula only applies to a
+// height of 11 km, or about 36000 ft)
+//  If altimeter setting (QNH, barometric pressure adjusted to sea
+//  level) is given, this function returns an indicated altitude
+//  compensated for actual regional pressure; otherwise, it returns
+//  the pressure altitude above the standard pressure level of 1013.25
+//  mbar or 29.9213 inHg
+function readPressureToAltitude(pressure_inHg, altimeter_setting_inHg) {
+  local altitude = (1 - pow(pressure_inHg / altimeter_setting_inHg, 0.190263)) * 145442;
+  return altitude;
+}
+
 function readTemperatureF() {
   local a = (0x5d << 1);
   local t = hardware.i2c89.read(a, "\x2B", 2);
@@ -29,7 +42,7 @@ function readPAT() {
   //do work of getting pressure
   local pressureA = readPressureInchesGH();
   //do work of getting altitude
-  //local altitude = pressureToAltitudeFeet(pressureA);
+  local altitude = pressureToAltitudeFeet(pressureA, 29.9213);
   //do work of getting temperature
   local temperature = readTemperatureF();
   //log pressure, altitude, temp to server.log
