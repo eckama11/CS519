@@ -51,8 +51,8 @@ function readPAT() {
   hardware.i2c12.write(a,"\x20\x00");
   //log pressure, altitude, temp to server.log
   server.log("pressure: " + pressureA + " inHG");
-  //server.log("altitude: " + altitude + " ft");
-  server.log("temperature: " + temperature + " deg F");
+  server.log("altitude: " + altitude + " ft");
+  //server.log("temperature: " + temperature + " deg F");
 }
  
 readPAT();
