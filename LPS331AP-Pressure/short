@@ -1,12 +1,12 @@
-hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
+hardware.i2c12.configure(CLOCK_SPEED_400_KHZ);
 
 function readPressureInchesGH() {
   local a = (0x5d << 1);
-  local press = hardware.i2c89.read(a, "\x28", 3);
-  local pressure = (press[0] << 16) + (press[1] << 8) + (press[2]);
+  local press = hardware.i2c12.read(a, "\xa8", 3);
+  local pressure = (press[2] << 16) + (press[1] << 8) + (press[0]);
   //2's compliment if the number is negative
   if (0x800000 & pressure) pressure = -(0x1000000-pressure);
-  pressure = pressure/4096;
+  pressure = pressure/138706.5;
   return pressure;
 }
 
@@ -18,15 +18,16 @@ function readPressureInchesGH() {
 //  compensated for actual regional pressure; otherwise, it returns
 //  the pressure altitude above the standard pressure level of 1013.25
 //  mbar or 29.9213 inHg
-function readPressureToAltitude(pressure_inHg, altimeter_setting_inHg) {
-  local altitude = (1 - pow(pressure_inHg / altimeter_setting_inHg, 0.190263)) * 145442;
+function pressureToAltitudeFeet(pressureA, stanPres) {
+  local a = math.pow(pressureA/stanPres, 0.190263);
+  local altitude = (1 - a) * 145442;
   return altitude;
 }
-
+//at this time this is not working properly
 function readTemperatureF() {
   local a = (0x5d << 1);
-  local t = hardware.i2c89.read(a, "\x2B", 2);
-  local temp = (t[0] << 8) + (t[1]);
+  local t = hardware.i2c12.read(a, "\x2B", 2);
+  local temp = (t[1] << 8) + (t[0]);
   temp = 42.5 + (temp/480) ; 
   //convert to Farenheit
   temp = (9/5)*(temp + 32);
@@ -35,8 +36,9 @@ function readTemperatureF() {
 
 //function to read pressure, altitude, temp
 function readPAT() {
-  //need to turn device on
-  hardware.i2c89.write(0x5d << 1,"\x20\xe0");
+  local a = (0x5d << 1);
+  //turn sensor on
+  hardware.i2c12.write(a,"\x20\xe0");
   //wait .5 seconds
   imp.sleep(0.5);
   //do work of getting pressure
@@ -44,10 +46,12 @@ function readPAT() {
   //do work of getting altitude
   local altitude = pressureToAltitudeFeet(pressureA, 29.9213);
   //do work of getting temperature
-  local temperature = readTemperatureF();
+  //local temperature = readTemperatureF();
+  //turn sensor off
+  hardware.i2c12.write(a,"\x20\x00");
   //log pressure, altitude, temp to server.log
   server.log("pressure: " + pressureA + " inHG");
-  server.log("altitude: " + altitude + " ft");
+  //server.log("altitude: " + altitude + " ft");
   server.log("temperature: " + temperature + " deg F");
 }
  
