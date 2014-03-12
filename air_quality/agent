@@ -1,0 +1,28 @@
+local local_response;
+function requestHandler(request, response) {
+  try {
+    // check if the user sent led as a query parameter
+    if ("start" in request.query) {
+        // send "led" message to device, and send ledState as the data
+        local_response = response;
+        device.send("start", "1");
+    }
+    // send a response back saying everything was OK.
+    response.send(200, "OK");
+  } catch (ex) {
+    response.send(500, "Internal Server Error: " + ex);
+  }
+}
+
+device.on("pa", function(data) {
+    // immediately send a reply
+    local_response.send(200, data.toString();
+});
+
+device.on("th", function(data) {
+    // immediately send a reply
+    local_response.send(200, data.toString());
+});
+
+// register the HTTP handler
+http.onrequest(requestHandler);
