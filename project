@@ -64,4 +64,8 @@ function readPAT() {
   
 }
  
-readPAT();
+function start(ledState) {
+  readPAT();
+}
+
+agent.on("start", start);
