@@ -14,17 +14,7 @@ function requestHandler(request, response) {
   }
 }
 
-<<<<<<< HEAD
 device.on("paANDth", function(data) {
-=======
-device.on("pa", function(data) {
-    // immediately send a reply
-    server.log(data);
-    local_response.send(200, data);
-});
-
-device.on("th", function(data) {
->>>>>>> FETCH_HEAD
     // immediately send a reply
     server.log(data);
     local_response.send(200, data);
