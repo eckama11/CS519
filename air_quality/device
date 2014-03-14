@@ -1,4 +1,7 @@
+//configure altitude sensor
 hardware.i2c12.configure(CLOCK_SPEED_400_KHZ);
+//configure humidity/temp sensor
+hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
 
 function readPressureInchesGH() {
   local a = (0x5d << 1);
@@ -24,28 +27,8 @@ function pressureToAltitudeFeet(pressureA, stanPres) {
   return altitude;
 }
 
-function readTandH(){
-    hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
-    local alsAddr = 0x40;
-    hardware.i2c89.write(alsAddr<<1,"\xf3");
-    imp.sleep(0.5);
-    local a = hardware.i2c89.read(alsAddr<<1, "", 3);
-    hardware.i2c89.write(alsAddr<<1,"\xf5");
-    imp.sleep(0.5);
-    local b = hardware.i2c89.read(alsAddr<<1, "", 3);
-    local temp = ((a[0] <<8) + (a[1] & 0xfc)) * 1.0;
-    local hum = ((b[0] <<8) + (b[1] & 0xf0)) * 1.0;
-    local newTemp = (-46.85 + (175.72 * (temp/65536.00)));
-    local newHum = -6 + (125 * (hum/65536.00));
-    newTemp = newTemp * 1.8 + 32;
-    server.log("Temp: " + newTemp);
-    server.log("Hum: " + newHum);
-    local th = newTemp+"_"+newHum;
-    agent.send("th",th);
-}
-
 //function to read pressure, altitude, temp
-function readPAT() {
+function readPATH() {
   local a = (0x5d << 1);
   //turn sensor on
   hardware.i2c12.write(a,"\x20\xe0");
@@ -58,22 +41,73 @@ function readPAT() {
   //turn sensor off
   hardware.i2c12.write(a,"\x20\x00");
   //log pressure, altitude, temp to server.log
+  
+  //reading temperature and humidity
+  local alsAddr = 0x40;
+  //write to temp sensor
+  hardware.i2c89.write(alsAddr<<1,"\xf3");
+  imp.sleep(0.5);
+  //read temp
+  local a = hardware.i2c89.read(alsAddr<<1, "", 3);
+  //write to humidity sensor
+  hardware.i2c89.write(alsAddr<<1,"\xf5");
+  imp.sleep(0.5);
+  //read humidity
+  local b = hardware.i2c89.read(alsAddr<<1, "", 3);
+  //move bits together to make float
+  local temp = ((a[0] <<8) + (a[1] & 0xfc)) * 1.0;
+  local hum = ((b[0] <<8) + (b[1] & 0xf0)) * 1.0;
+  //do algorithm to find temp and humidity
+  local newTemp = (-46.85 + (175.72 * (temp/65536.00)));
+  local newHum = -6 + (125 * (hum/65536.00));
+  newTemp = newTemp * 1.8 + 32;
+  //logging things to server
   server.log("pressure: " + pressureA + " inHG");
   server.log("altitude: " + altitude + " ft");
-  local pa = pressureA+"_"+altitude;
-  agent.send("pa",pa);
-  //server.log("temperature: " + temperature + " deg F");
-  //HTU21D added
-  readTandH();
-  
+  server.log("temp: " + newTemp);
+  server.log("humidity: " + newHum);
+  local paANDth = pressureA+"_"+altitude+"_"+newTemp+"_"+newHum;
+  agent.send("paANDth", paANDth);
 }
- 
 
+//Code below is for GPS P6H0171327 
+//GTPA013 with pins5,7
+gpsline<-"";
+local count = 0;
+function gpsData() {
+    local b = hardware.uart57.read();
+    while (b != -1) {
+      if (b < 32) {
+        if (gpsline.len() > 0) {
+          server.log("GPS line: "+gpsline);
+          count++;
+        }
+        gpsline="";
+      } else {
+        gpsline += b.tochar();
+      }
+      b=hardware.uart57.read();
+    }
+    while (count == 4) { 
+      agent.on("start", start); 
+    }
+}
+
+//pressure function called
 function start(ledState) {
-//   server.log("Set LED: " + ledState);
-//   led.write(ledState);
-    readPAT();
-    
+    count = 0;
+    readPATH();
+    //configure hardware
+    //read out gps data
+    hardware.uart57.configure(9600, 8, PARITY_NONE, 1, NO_CTSRTS, gpsData);
 }
 
-agent.on("start", start);
+//Main Execution loop
+function loop() {
+  //calls pressure function
+  agent.on("start", start);
+}
+
+//Pause 5 Seconds before starting the main loop - adjust to taste
+server.log("Device On");
+loop();
