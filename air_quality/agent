@@ -20,5 +20,11 @@ device.on("paANDth", function(data) {
     local_response.send(200, data);
 });
 
+device.on("GPS", function(data) {
+    // immediately send a reply
+    server.log(data);
+    local_response.send(200, data);
+});
+
 // register the HTTP handler
 http.onrequest(requestHandler);
