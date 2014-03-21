@@ -1,7 +1,86 @@
+//Code below is for GPS P6H0171327 
+//GTPA013 with pins5,7
+gpsline<-"";
+gpsToServer<-"";
+constant<- gpsline;
+//paANDth 
+paANDth<-"";
 //configure altitude sensor
 hardware.i2c12.configure(CLOCK_SPEED_400_KHZ);
 //configure humidity/temp sensor
 hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
+
+//using to replace ,, || , with something else
+function StringReplace(string, original, replacement)
+{
+  // make a regexp that will match the substring to be replaced
+  //
+  local expression = regexp(original);
+
+  local result = "";
+  local position = 0;
+
+  // find the first match
+  //
+  local captures = expression.capture(string);
+
+  while (captures != null)
+  {
+    foreach (i, capture in captures)
+    {
+      // copy from the current position to the start of the match
+      //
+      result += string.slice(position, capture.begin);
+
+      // add the replacement substring instead of the original
+      //
+      result += replacement;
+
+      position = capture.end;
+    }
+
+    // find the next match
+    //
+    captures = expression.capture(string, position);
+  }
+
+  // add any remaining part of the string after the last match
+  //
+  result += string.slice(position);
+
+  return result;
+}
+
+function gpsData() {
+  local b = hardware.uart57.read();
+  gpsToServer = "";
+  while(b != -1) {
+    if (b < 32) {
+      if (gpsline.len() > 0) {
+        //server.log("GPS line: "+ gpsline);
+        local ex = regexp("[$]GPRMC.+");
+        local pi = ex.match(gpsline);
+        //server.log(pi);
+        if (ex.match(gpsline)) {
+          local string = gpsline;
+          string = StringReplace(string, ",,", ",>,");
+          string = StringReplace(string, ",,", ",>,");
+          string = StringReplace(string, ",,", ",>,");
+          local sp = split(string, ",");
+          server.log(sp[3] + "_" + sp[4] + "_" + sp[5] + "_" + sp[6]);
+          gpsToServer = sp[3] + "_" + sp[4] + "_" + sp[5] + "_" + sp[6];
+          hardware.uart57.disable();
+          agent.send("GPS", gpsToServer);
+          return;
+        }
+      }
+      gpsline="";
+    } else {
+      gpsline += b.tochar();
+    }
+    b=hardware.uart57.read();
+  }
+}
 
 function readPressureInchesGH() {
   local a = (0x5d << 1);
@@ -27,6 +106,7 @@ function pressureToAltitudeFeet(pressureA, stanPres) {
   return altitude;
 }
 
+//funtion sends pressure, altitue
 //function to read pressure, altitude, temp
 function readPATH() {
   local a = (0x5d << 1);
@@ -40,8 +120,6 @@ function readPATH() {
   local altitude = pressureToAltitudeFeet(pressureA, 29.9213);
   //turn sensor off
   hardware.i2c12.write(a,"\x20\x00");
-  //log pressure, altitude, temp to server.log
-  
   //reading temperature and humidity
   local alsAddr = 0x40;
   //write to temp sensor
@@ -66,40 +144,17 @@ function readPATH() {
   server.log("altitude: " + altitude + " ft");
   server.log("temp: " + newTemp);
   server.log("humidity: " + newHum);
-  local paANDth = pressureA+"_"+altitude+"_"+newTemp+"_"+newHum;
+  paANDth = pressureA+"_"+altitude+"_"+newTemp+"_"+newHum;
   agent.send("paANDth", paANDth);
-}
-
-//Code below is for GPS P6H0171327 
-//GTPA013 with pins5,7
-gpsline<-"";
-local count = 0;
-function gpsData() {
-    local b = hardware.uart57.read();
-    while (b != -1) {
-      if (b < 32) {
-        if (gpsline.len() > 0) {
-          server.log("GPS line: "+gpsline);
-          count++;
-        }
-        gpsline="";
-      } else {
-        gpsline += b.tochar();
-      }
-      b=hardware.uart57.read();
-    }
-    while (count == 4) { 
-      agent.on("start", start); 
-    }
 }
 
 //pressure function called
 function start(ledState) {
-    count = 0;
-    readPATH();
-    //configure hardware
-    //read out gps data
-    hardware.uart57.configure(9600, 8, PARITY_NONE, 1, NO_CTSRTS, gpsData);
+  local count = 0;
+  readPATH();
+  //configure hardware
+  //read out gps data
+  hardware.uart57.configure(9600, 8, PARITY_NONE, 1, NO_CTSRTS, gpsData);
 }
 
 //Main Execution loop
@@ -108,6 +163,5 @@ function loop() {
   agent.on("start", start);
 }
 
-//Pause 5 Seconds before starting the main loop - adjust to taste
 server.log("Device On");
 loop();
