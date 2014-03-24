@@ -32,8 +32,8 @@ CREATE TABLE altitude(
 
 CREATE TABLE sensorGPS(
     id INT NOT NULL AUTO_INCREMENT,
-    latitude DECIMAL(2,7) NOT NULL,
-    longitude DECIMAL(3,7) NOT NULL,
+    latitude DECIMAL(7,7) NOT NULL,
+    longitude DECIMAL(7,7) NOT NULL,
     timeInfo DATETIME NOT NULL,
     PRIMARY KEY (id)
 );
