@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS air_quality;
+
 CREATE DATABASE air_quality;
 USE air_quality;
 
