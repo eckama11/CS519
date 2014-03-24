@@ -45,3 +45,24 @@ CREATE TABLE sensorParticle(
     timeInfo DATETIME NOT NULL,
     PRIMARY KEY (id)
 );
+
+-- Create the user which the app will use to connect to the DB
+DROP PROCEDURE IF EXISTS air_quality.drop_user_if_exists ;
+DELIMITER $$
+CREATE PROCEDURE air_quality.drop_user_if_exists()
+BEGIN
+  DECLARE foo BIGINT DEFAULT 0 ;
+  SELECT COUNT(*)
+  INTO foo
+    FROM mysql.user
+      WHERE User = 'air_quality' and  Host = 'localhost';
+   IF foo > 0 THEN
+         DROP USER 'air_quality'@'localhost' ;
+  END IF;
+END ;$$
+DELIMITER ;
+CALL air_quality.drop_user_if_exists() ;
+DROP PROCEDURE IF EXISTS air_quality.drop_users_if_exists ;
+
+CREATE USER 'air_quality'@'localhost' IDENTIFIED BY 'air_quality';
+GRANT SELECT, INSERT, UPDATE, DELETE, EXECUTE, LOCK TABLES, CREATE TEMPORARY TABLES ON air_quality.* TO 'air_quality'@'localhost';
