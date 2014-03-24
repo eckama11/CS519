@@ -14,14 +14,10 @@ hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
 function StringReplace(string, original, replacement)
 {
   // make a regexp that will match the substring to be replaced
-  //
   local expression = regexp(original);
-
   local result = "";
   local position = 0;
-
   // find the first match
-  //
   local captures = expression.capture(string);
 
   while (captures != null)
@@ -29,25 +25,18 @@ function StringReplace(string, original, replacement)
     foreach (i, capture in captures)
     {
       // copy from the current position to the start of the match
-      //
       result += string.slice(position, capture.begin);
-
       // add the replacement substring instead of the original
-      //
       result += replacement;
-
       position = capture.end;
     }
 
     // find the next match
-    //
     captures = expression.capture(string, position);
   }
 
   // add any remaining part of the string after the last match
-  //
   result += string.slice(position);
-
   return result;
 }
 
@@ -63,12 +52,16 @@ function gpsData() {
         //server.log(pi);
         if (ex.match(gpsline)) {
           local string = gpsline;
+	  //when no data is logging empty strings are
+	  //recorded, following allows easy parsing
           string = StringReplace(string, ",,", ",>,");
           string = StringReplace(string, ",,", ",>,");
           string = StringReplace(string, ",,", ",>,");
-          local sp = split(string, ",");
+          
+	  local sp = split(string, ",");
           server.log(sp[3] + "_" + sp[4] + "_" + sp[5] + "_" + sp[6]);
           gpsToServer = sp[3] + "_" + sp[4] + "_" + sp[5] + "_" + sp[6];
+	  //stop GPS unit
           hardware.uart57.disable();
           agent.send("GPS", gpsToServer);
           return;
@@ -82,6 +75,7 @@ function gpsData() {
   }
 }
 
+//reads pressure sensor in iGH
 function readPressureInchesGH() {
   local a = (0x5d << 1);
   local press = hardware.i2c12.read(a, "\xa8", 3);
