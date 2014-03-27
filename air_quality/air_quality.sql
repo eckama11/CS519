@@ -46,13 +46,6 @@ CREATE TABLE sensorParticle(
     PRIMARY KEY (id)
 );
 
-CREATE TABLE loginSession(
-    sessionId VARCHAR(255) NOT NULL,
-    authenticatedEmployee INT NOT NULL,
-    PRIMARY KEY(sessionID),
-    FOREIGN KEY(authenticatedEmployee) REFERENCES employee(id)
-);
-
 CREATE TABLE user(
     id INT NOT NULL AUTO_INCREMENT,
     activeFlag TINYINT(1) NOT NULL,
@@ -60,6 +53,13 @@ CREATE TABLE user(
     password VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY (username)
+);
+
+CREATE TABLE loginSession(
+    sessionId VARCHAR(255) NOT NULL,
+    authenticatedUser INT NOT NULL,
+    PRIMARY KEY(sessionID),
+    FOREIGN KEY(authenticatedUser) REFERENCES user(id)
 );
 
 -- Create the user which the app will use to connect to the DB
