@@ -46,6 +46,13 @@ CREATE TABLE sensorParticle(
     PRIMARY KEY (id)
 );
 
+CREATE TABLE loginSession(
+    sessionId VARCHAR(255) NOT NULL,
+    authenticatedEmployee INT NOT NULL,
+    PRIMARY KEY(sessionID),
+    FOREIGN KEY(authenticatedEmployee) REFERENCES employee(id)
+);
+
 -- Create the user which the app will use to connect to the DB
 DROP PROCEDURE IF EXISTS air_quality.drop_user_if_exists ;
 DELIMITER $$
