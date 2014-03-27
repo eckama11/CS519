@@ -53,6 +53,15 @@ CREATE TABLE loginSession(
     FOREIGN KEY(authenticatedEmployee) REFERENCES employee(id)
 );
 
+CREATE TABLE user(
+    id INT NOT NULL AUTO_INCREMENT,
+    activeFlag TINYINT(1) NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY (username)
+);
+
 -- Create the user which the app will use to connect to the DB
 DROP PROCEDURE IF EXISTS air_quality.drop_user_if_exists ;
 DELIMITER $$
