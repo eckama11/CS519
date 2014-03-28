@@ -48,7 +48,6 @@ CREATE TABLE sensorParticle(
 
 CREATE TABLE user(
     id INT NOT NULL AUTO_INCREMENT,
-    activeFlag TINYINT(1) NOT NULL,
     username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
