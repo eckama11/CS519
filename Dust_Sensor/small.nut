@@ -26,12 +26,13 @@ function loop() {
   imp.sleep(0.00009680);
 
   //0-3.3V mapped to 0-65,535 integer value
-  //recover voltage
-  local calcVoltage = voMeasured * (3.3/65535.0);
-  //linear equation taken from 
-  //http://www.howmuchsnow.com/arduino/airquality/
-  //Chris Nafis (c) 2012
-  local dustDensity = 0.17 * calcVoltage - 0.1;
+  //recover voltage based in slope intercept
+  //of voltage versus reading
+  local calcVoltage = (2.7/65535)*voMeasured + 0.6;
+  //recover dust density based on slope intercept
+  //of dust density versus voltage given in 
+  //Sharp's datasheet via sparkfun
+  local dustDensity = (calcVoltage - 0.6)/6.0;
 
   //log answer
   server.log("Raw Signal Value (0-65,535): " + voMeasured);
@@ -41,7 +42,7 @@ function loop() {
 
 function bigLoop() { 
     loop();
-    imp.wakeup(1, bigLoop); // sleep for 10 seconds
+    imp.wakeup(900, bigLoop); // sleep for 10 seconds
 }
  
 bigLoop();
