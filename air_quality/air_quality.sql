@@ -43,6 +43,7 @@ CREATE TABLE sensorGPS(
 CREATE TABLE sensorParticle(
     id INT NOT NULL AUTO_INCREMENT,
     timeInfo DATETIME NOT NULL,
+    particles DECIMAL(3,3) NOT NULL,
     PRIMARY KEY (id)
 );
 
