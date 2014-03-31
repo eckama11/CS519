@@ -1,6 +1,4 @@
 <?php
-
-//require_once( "DBInterface.php" );
 if (!ob_get_level())
 	ob_start();
 

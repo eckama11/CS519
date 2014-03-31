@@ -13,7 +13,7 @@ else if ((substr($page, 0, strlen($prefix)) != $prefix) || !is_readable($page))
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
         <base href="<?php echo htmlentities(BASE_URL); ?>">
- 		<title>UPay</title>
+ 		<title>Air Quality</title>
  		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<!-- StyleSheet -->
 		<link rel="stylesheet" href="css/bootstrap.min.css" />
