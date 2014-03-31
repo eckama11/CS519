@@ -1,30 +1,42 @@
-local local_response;
-function requestHandler(request, response) {
-  try {
-    // check if the user sent led as a query parameter
-    if ("start" in request.query) {
-        // send "led" message to device, and send ledState as the data
-        local_response = response;
-        device.send("start", "1");
-    }
-    // send a response back saying everything was OK.
-    response.send(200, "111");
-  } catch (ex) {
-    response.send(500, "Internal Server Error: " + ex);
-  }
+function httpPostInsert(data, url) {
+    server.log(data);
+    local request = http.post(url, {"Content-Type": "application/x-www-form-urlencoded"}, data)
+    local response = request.sendsync();
+    return response;
 }
 
-device.on("paANDth", function(data) {
-    // immediately send a reply
-    server.log(data);
-    local_response.send(200, data);
+/*
+device.on("pressure", function(data) {
+    local response = httpPostInsert(data, "http://138.49.196.13/ci/index.php/site/addpressure?data=" + data);
+    server.log("respone body: " + response.body);
+});
+*/
+
+device.on("altitude", function(data) {
+    local response = httpPostInsert("", "http://138.49.196.13/ci/index.php/site/addaltitude?data=" + data);
+    server.log("respone body: " + response.body);
 });
 
+device.on("temperature", function(data) {
+    local response = httpPostInsert("", "http://138.49.196.13/ci/index.php/site/addtemperature?data=" + data);
+    server.log("respone body: " + response.body);
+});
+
+device.on("humidity", function(data) {
+    local response = httpPostInsert("", "http://138.49.196.13/ci/index.php/site/addhumidity?data=" + data);
+    server.log("respone body: " + response.body);
+});
+
+/*
+device.on("dust", function(data) {
+    local response = httpPostInsert(data, "http://138.49.196.13/ci/index.php/site/adddust?data=" + data);
+    server.log("respone body: " + response.body);
+});
+*/
+
+/*
 device.on("GPS", function(data) {
-    // immediately send a reply
-    server.log(data);
-    local_response.send(200, data);
+    local response = httpPostInsert(data, "http://138.49.196.13/ci/index.php/site/addgps?data=" + data);
+    server.log("respone body: " + response.body);
 });
-
-// register the HTTP handler
-http.onrequest(requestHandler);
+*/
