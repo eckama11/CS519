@@ -96,6 +96,12 @@ require_once("common.php");
                         		<input name="email" maxlength="50" placeholder="Enter Password" type="email" class="form-control" id="email" />
                     		</div>
                     	</div>
+                    	<div class="control-group">
+                        	<label class="control-label" for="email">Product #</label>
+                        	<div class="controls">
+                        		<input name="product" maxlength="50" placeholder="Enter Product #" type="text" class="form-control" id="product" />
+                    		</div>
+                    	</div>
 						<div class="control-group">
                         	<label class="control-label" for="password">Password</label>
                         	<div class="controls">
