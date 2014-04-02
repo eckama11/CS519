@@ -97,9 +97,9 @@ require_once("common.php");
                     		</div>
                     	</div>
                     	<div class="control-group">
-                        	<label class="control-label" for="email">Product #</label>
+                        	<label class="control-label" for="device">Device #</label>
                         	<div class="controls">
-                        		<input name="product" maxlength="50" placeholder="Enter Product #" type="text" class="form-control" id="product" />
+                        		<input name="device" maxlength="50" placeholder="Enter Device #" type="text" class="form-control" id="device" />
                     		</div>
                     	</div>
 						<div class="control-group">
