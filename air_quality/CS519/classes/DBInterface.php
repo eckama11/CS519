@@ -237,12 +237,12 @@ class DBInterface {
 
     /**
      * Writes an User to the database.
-     * @param   User    $User   The User to write.  If the id property is 0, a new
+     * @param   User    $user   The User to write.  If the id property is 0, a new
      *                                  record will be created, otherwise an existing record matching
      *                                  the id will be updated.
      * @return  User    A new User instance (with the new id if a new record was created).
      */
-    public function writeUser( $user ) {
+    public function writeUser( User $user ) {
         static $stmtInsert;
         static $stmtUpdate;
         if ($stmtInsert == null) {
@@ -254,17 +254,22 @@ class DBInterface {
                         ")"
                 );
 
+            if (!$stmtInsert)
+                throw new Exception($this->formatErrorMessage(null, "Unable to prepare user insert"));
+
             $stmtUpdate = $this->dbh->prepare(
+            //UPDATE `air_quality`.`user` SET `username` = 'admin8' WHERE `user`.`id` = 1;
                     "UPDATE user SET ".
-                            "username = :username, ".
-                            "password = :password, ".
+                            "password = :password ".
                         "WHERE id = :id"
                 );
+
+            if (!$stmtUpdate)
+                throw new Exception($this->formatErrorMessage(null, "Unable to prepare user update"));
         }
 
         $params = Array(
-                ':username' => $User->username,
-                ':password' => $User->password
+                ':password' => $user->password
             );
 
         if ($user->id == 0) {
@@ -277,17 +282,18 @@ class DBInterface {
         $success = $stmt->execute($params);
 
         if ($success == false)
-            throw new Exception($this->formatErrorMessage($stmt, "Unable to store User record in database"));
+            throw new Exception($this->formatErrorMessage($stmt, "Unable to store user record in database"));
 
-        if ($User->id == 0)
+        if ($user->id == 0)
             $newId = $this->dbh->lastInsertId();
         else
-            $newId = $User->id;
+            $newId = $user->id;
 
+        
         return new User(
                 $newId,
-                $User->username,
-                $User->password
+                $user->username,
+                $user->password
             );
     } // writeUser
 

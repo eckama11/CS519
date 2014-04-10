@@ -1,5 +1,5 @@
 <?php
-    require_once(dirname(__FILE__)."/../common.php");
+    require_once("common.php");
     if (!isset($loginSession))
         doUnauthenticatedRedirect();
 ?>
@@ -28,7 +28,7 @@ function changePassword(form) {
 
     $.ajax({
         "type" : "POST",
-        "url" : "Employee/doChangePassword.php",
+        "url" : "doChangePassword.php",
         "data" : $(form).serialize(),
         "dataType" : "json"
         })
@@ -64,12 +64,12 @@ function changePassword(form) {
     </div>
 
 	<div id="content">
-        <legend>Change password for <?php echo htmlentities($loginSession->authenticatedEmployee->name); ?></legend>
+        <legend>Change password for <?php echo htmlentities($loginSession->authenticatedUser->username); ?></legend>
         <form role="form" class="form-horizontal" onsubmit="return changePassword(this)">
             <div class="form-group">
                 <label class="col-sm-2 control-label">Username</label>
                 <div class="col-sm-10">
-                    <p class="form-control-static"><?php echo htmlentities($loginSession->authenticatedEmployee->username); ?></p>
+                    <p class="form-control-static"><?php echo htmlentities($loginSession->authenticatedUser->username); ?></p>
                 </div>
             </div>
 
