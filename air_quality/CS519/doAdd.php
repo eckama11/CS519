@@ -1,7 +1,9 @@
 <?php
-require_once(dirname(__FILE__)."/../common.php");
+require_once("common.php");
 
-// If the form was posted, verify the old password and update the password if the 2 new passwords match and are acceptable
+// If the form was posted, verify the old password 
+// and update the password if the 2 new passwords match and are acceptable
+// check that username is not taken
 $username = @$_POST['username'];
 $email = @$_POST['email'];
 $device = @$_POST['device'];
@@ -12,7 +14,7 @@ $rv = (Object)[];
 try {
 	// Verify the username is unique
 	if ($db->isUsernameInUse($username))
-		throw new Exception("The username '$username' is already assigned to another employee");
+		throw new Exception("The username '$username' is already assigned to another user");
 
 	// Verify the password is valid
 	if ($password1 != $password2)
@@ -26,12 +28,11 @@ try {
 	//will be used in DBInterface to make new id
 	$id = 0;
 
-    // Create/update the employee record
+    // Create/update the user record
     $user = new USER(
-                $id, $username, $password1,
-                $email, $device
+                $id, $username, $password1, $email
             );
-    $user = $db->writeUser($emp);
+    $user = $db->writeUser($user);
 
     $rv->success = true;
 } catch (Exception $ex) {

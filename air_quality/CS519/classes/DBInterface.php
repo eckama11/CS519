@@ -276,6 +276,7 @@ class DBInterface {
         }
 
         $params = Array(
+        		':username' => $user->username,
                 ':password' => $user->password,
                 ':email' => $user->email
             );
@@ -296,8 +297,7 @@ class DBInterface {
             $newId = $this->dbh->lastInsertId();
         else
             $newId = $user->id;
-
-        
+ 
         return new User(
                 $newId,
                 $user->username,

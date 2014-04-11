@@ -24,6 +24,7 @@ try {
 
     // Update the employee
     $loginSession->authenticatedUser->password = $newPassword1;
+    
     $db->writeUser($loginSession->authenticatedUser);
 
     $rv->success = true;
