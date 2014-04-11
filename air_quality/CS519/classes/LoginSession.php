@@ -11,12 +11,14 @@ class LoginSession
     /**
      * Constructs a new LoginSession object.
      *
-     * @param   string   $sessionId              The unique database session ID assigned to the LoginSession.
-     * @param   User $authenticatedUser  The user authenticated to this session.
+     * @param   string   $sessionId             The unique database session ID assigned to the LoginSession.
+     * @param   User	 $authenticatedUser  	The user authenticated to this session.
      */
     public function __construct($sessionId, User $authenticatedUser) {
         $this->_sessionId = $sessionId;
+         
         $this->_authenticatedUser = $authenticatedUser;
+        
     } // __construct
 
     protected function getSessionId() {

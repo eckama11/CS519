@@ -7,6 +7,7 @@ class User
     private $_id;
     private $_username;
     private $_password;
+    private $_email;
 
     /**
      * Constructs a new User object.
@@ -14,9 +15,10 @@ class User
      * @param   int     $id
      * @param   string  $username
      * @param   string  $password
+     * @param	string	$email
      */
     public function __construct(
-            $id, $username, $password
+            $id, $username, $password, $email
         )
     {
         if (!is_numeric($id))
@@ -25,6 +27,7 @@ class User
 
         $this->username = $username;
         $this->password = $password;
+        $this->email = $email;
     } // __construct
     
     protected function getId() {
@@ -52,8 +55,18 @@ class User
         $this->_password = $newPassword;
     } // setPassword
 
+	protected function getEmail() {
+        return $this->_email;
+    } // getEmail
+
+	protected function setEmail($newEmail) {
+		if (empty($newEmail))
+			throw new Exception("Email cannot be empty string");
+		$this->_email = $newEmail;
+	} //setEmail
+
     public function __toString() {
-        return __CLASS__ ."(id=$this->id, username=$this->username, password=$this->password,)";
+        return __CLASS__ ."(id=$this->id, username=$this->username, password=$this->password, email=$this->email)";
     } // __toString
 
 } // class User

@@ -96,7 +96,9 @@ class DBInterface {
                         ")"
                 );
         }
-
+		
+		
+		
         $success = $loginStmt->execute(Array(
                 ':username' => $username,
                 ':password' => $password
@@ -113,9 +115,10 @@ class DBInterface {
         // Generate a new session ID
         // This may be somewhat predictable, but should be strong enough for purposes of the demo
         $sessionId = md5(uniqid(microtime()) . $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']);
-
+		 
         $rv = new LoginSession( $sessionId, $this->readUser($authenticatedUser) );
-
+		//if(true)
+		//	throw new Exception($this->formatErrorMessage($loginStmt, "Here"));
         // Create the loginSession record
         $success = $insertStmt->execute(Array(
                 ':sessionId' => $sessionId,
@@ -185,12 +188,13 @@ class DBInterface {
         static $stmt;
         if ($stmt == null)
             $stmt = $this->dbh->prepare(
-                   "SELECT id, username, password ".
+                   "SELECT id, username, password, email ".
                         "FROM user ".
                         "WHERE id = ?"
                 );
 
         $success = $stmt->execute(Array( $id ));
+       
         if ($success === false)
             throw new Exception($this->formatErrorMessage($stmt, "Unable to query database for User record"));
 
@@ -201,8 +205,11 @@ class DBInterface {
         return new User(
                 $row->id,
                 $row->username,
-                $row->password
+                $row->password,
+                $row->email
             );
+            if(true)
+            	throw new Exception($this->formatErrorMessage($loginStmt, "Here"));
     } // readUser
 
     /**
@@ -214,7 +221,7 @@ class DBInterface {
         static $stmt;
         if ($stmt == null)
             $stmt = $this->dbh->prepare(
-                    "SELECT id, username, password ".
+                    "SELECT id, username, password, email ".
                         "FROM user ".
                         "ORDER BY username"
                 );
@@ -228,7 +235,8 @@ class DBInterface {
             $rv[] = new User(
                     $row->id,
                     $row->username,
-                    $row->password
+                    $row->password,
+                    $row->email
                 );
         } // while
 
@@ -248,9 +256,9 @@ class DBInterface {
         if ($stmtInsert == null) {
             $stmtInsert = $this->dbh->prepare(
                     "INSERT INTO user ( ".
-                            "username, password".
+                            "username, password, email".
                         ") VALUES ( ".
-                            ":username, :password".
+                            ":username, :password, :email".
                         ")"
                 );
 
@@ -258,9 +266,8 @@ class DBInterface {
                 throw new Exception($this->formatErrorMessage(null, "Unable to prepare user insert"));
 
             $stmtUpdate = $this->dbh->prepare(
-            //UPDATE `air_quality`.`user` SET `username` = 'admin8' WHERE `user`.`id` = 1;
                     "UPDATE user SET ".
-                            "password = :password ".
+                            "password = :password, email = :email ".
                         "WHERE id = :id"
                 );
 
@@ -269,7 +276,8 @@ class DBInterface {
         }
 
         $params = Array(
-                ':password' => $user->password
+                ':password' => $user->password,
+                ':email' => $user->email
             );
 
         if ($user->id == 0) {
@@ -293,7 +301,8 @@ class DBInterface {
         return new User(
                 $newId,
                 $user->username,
-                $user->password
+                $user->password,
+                $user->email
             );
     } // writeUser
 
