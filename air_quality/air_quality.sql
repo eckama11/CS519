@@ -26,7 +26,7 @@ CREATE TABLE user(
     UNIQUE KEY (username)
 );
 
-CREATE TABLE imp(
+CREATE TABLE device(
     id INT NOT NULL AUTO_INCREMENT,
     userId INT NOT NULL,
     PRIMARY KEY (id),
