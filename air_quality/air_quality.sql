@@ -27,7 +27,7 @@ CREATE TABLE user(
 );
 
 CREATE TABLE device(
-    id INT NOT NULL AUTO_INCREMENT,
+    id VARCHAR(255) NOT NULL,
     userId INT NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY(userId) REFERENCES user(id)
