@@ -23,7 +23,7 @@ class Device
 
 		if (!is_numeric($userId))
 			throw new Exception("The \$userId paramater must be an int");
-		$this->_id = (string) $id;
+		$this->_userId = (int) $userId;
     } // __construct
 
     protected function getId() {

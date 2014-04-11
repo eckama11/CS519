@@ -29,10 +29,17 @@ try {
 	$id = 0;
 
     // Create/update the user record
-    $user = new USER(
+    $user1 = new User(
                 $id, $username, $password1, $email
             );
-    $user = $db->writeUser($user);
+    $user = $db->writeUser($user1);
+    
+    // Create new device record
+    $dev = new Device(
+    		$device, $user->id
+    	);
+    $dev = $db->writeDevice($dev);
+    
 
     $rv->success = true;
 } catch (Exception $ex) {

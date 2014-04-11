@@ -54,13 +54,8 @@ function showError(message) {
 				</button>
 				<div class="collapse navbar-collapse navHeaderCollapse">
 					<ul class="nav navbar-nav navbar-right">
-						<li><a href="page.php/Sensors/Altitude">Altitude/Pressure</a></li>
-						<li><a href="page.php/Sensors/Dust">Dust</a></li>
-						<li><a href="page.php/Sensors/GPS">GPS</a></li>
-						<li><a href="page.php/Sensors/Humidity">Humidity</a></li>
-						<li><a href="page.php/Sensors/Temperature">Temperature</a></li>
-						<li><a href="page.php/Sensors/All">All</a></li>
-						<li><a href="page.php/Pass">Account Settings</a></li>
+						<li><a href="page.php/addDevice">Add Device</a></li>
+						<li><a href="page.php/Pass">Password Reset</a></li>
 						<li><a href="logout.php">Logout</a></li>
 					</ul>
 				</div>
