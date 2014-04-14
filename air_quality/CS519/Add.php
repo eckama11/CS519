@@ -87,7 +87,7 @@ if (isset($loginSession))
 		<body>
 			<div class="navbar navbar-inverse navbar-static-top">
 				<div class="container">
-					<a href="#" class="navbar-brand">UPay Solutions</a>
+					<a href="#" class="navbar-brand">Air Quality</a>
 					<button class="navbar-toggle" data-toggle="collapse" data-target=".navHeaderCollapse">
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
@@ -111,7 +111,7 @@ if (isset($loginSession))
 						<img src="spinner.gif">
 					</div>
 					<div id="successDiv" style="padding:10px; outline:10px solid black; display:none">
-        				You have been added. Go to login by clicking the U Pay link on the top left.
+        				You have been added. Go to login by clicking the Air Quality link on the top left.
     				</div>
 					<div id="loginDiv" class="col-md-3 col-md-offset-5" style="padding-bottom:10px; outline: 10px solid black;">
 						<form class="form-horizontal" method="post" onsubmit="return addUser(this)">
