@@ -22,9 +22,9 @@ CREATE TABLE user(
     username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
-    deviceId VARCHAR(255) NOT NULL.
+    deviceId VARCHAR(255) NOT NULL,
     PRIMARY KEY (id),
-    UNIQUE KEY (username)
+    UNIQUE KEY username_deviceId(username, deviceId)
 );
 
 CREATE TABLE loginSession(
