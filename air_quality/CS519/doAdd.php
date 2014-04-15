@@ -27,19 +27,13 @@ try {
 	// id = 0 means no id given yet 
 	//will be used in DBInterface to make new id
 	$id = 0;
-
+		
     // Create/update the user record
     $user1 = new User(
-                $id, $username, $password1, $email
-            );
+                $id, $username, $password1, $email, $device
+            );        
+            
     $user = $db->writeUser($user1);
-    
-    // Create new device record
-    $dev = new Device(
-    		$device, $user->id
-    	);
-    $dev = $db->writeDevice($dev);
-    
 
     $rv->success = true;
 } catch (Exception $ex) {

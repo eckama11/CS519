@@ -221,7 +221,7 @@ class DBInterface {
         static $stmt;
         if ($stmt == null)
             $stmt = $this->dbh->prepare(
-                    "SELECT id, username, password, email ".
+                    "SELECT id, username, password, email, deviceId ".
                         "FROM user ".
                         "ORDER BY username"
                 );
@@ -236,7 +236,8 @@ class DBInterface {
                     $row->id,
                     $row->username,
                     $row->password,
-                    $row->email
+                    $row->email,
+                    $row->device
                 );
         } // while
 
@@ -256,9 +257,9 @@ class DBInterface {
         if ($stmtInsert == null) {
             $stmtInsert = $this->dbh->prepare(
                     "INSERT INTO user ( ".
-                            "username, password, email".
+                            "username, password, email, deviceId".
                         ") VALUES ( ".
-                            ":username, :password, :email".
+                            ":username, :password, :email, :device".
                         ")"
                 );
 
@@ -267,7 +268,7 @@ class DBInterface {
 
             $stmtUpdate = $this->dbh->prepare(
                     "UPDATE user SET ".
-                            "password = :password, email = :email ".
+                            "password = :password, email = :email, device = :device ".
                         "WHERE id = :id"
                 );
 
@@ -278,7 +279,8 @@ class DBInterface {
         $params = Array(
         		':username' => $user->username,
                 ':password' => $user->password,
-                ':email' => $user->email
+                ':email' => $user->email,
+                ':device' => $user->device
             );
 
         if ($user->id == 0) {
@@ -302,45 +304,9 @@ class DBInterface {
                 $newId,
                 $user->username,
                 $user->password,
-                $user->email
+                $user->email,
+                $user->device
             );
     } // writeUser
 
-   
-   /**
-     * Writes an Device to the database.
-     * @param   Device    $device   The Device to write.  
-     * @return  Device    A new Device instance.
-     */
-    public function writeDevice( Device $device ) {
-        static $stmtInsert;
-        if ($stmtInsert == null) {
-            $stmtInsert = $this->dbh->prepare(
-                    "INSERT INTO device ( ".
-                            "id, userId".
-                        ") VALUES ( ".
-                            ":id, :userId".
-                        ")"
-                );
-
-            if (!$stmtInsert)
-                throw new Exception($this->formatErrorMessage(null, "Unable to prepare device insert"));
-        }
-
-        $params = Array(
-        		':id' => $device->id,
-                ':userId' => $device->userId
-            );
-        $stmt = $stmtInsert;
-        $success = $stmt->execute($params);
-
-        if ($success == false)
-            throw new Exception($this->formatErrorMessage($stmt, "Unable to store device record in database"));
-
-        return new Device(
-                $device->id,
-                $device->userId
-            );
-    } // writeDevice
-   
 } // DBInterface

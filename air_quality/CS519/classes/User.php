@@ -3,11 +3,12 @@
 class User
     extends GetterSetter
 {
-
+//Attempt to set unknown property 'device' for object of class 'User'
     private $_id;
     private $_username;
     private $_password;
     private $_email;
+    private $_device;
 
     /**
      * Constructs a new User object.
@@ -16,9 +17,10 @@ class User
      * @param   string  $username
      * @param   string  $password
      * @param	string	$email
+     * @param	string	$device
      */
     public function __construct(
-            $id, $username, $password, $email
+            $id, $username, $password, $email, $device
         )
     {
         if (!is_numeric($id))
@@ -28,6 +30,7 @@ class User
         $this->username = $username;
         $this->password = $password;
         $this->email = $email;
+        $this->device = $device;
     } // __construct
     
     protected function getId() {
@@ -65,8 +68,18 @@ class User
 		$this->_email = $newEmail;
 	} //setEmail
 
+	protected function getDevice() {
+        return $this->_device;
+    } // getDevice
+
+	protected function setDevice($newDevice) {
+		if (empty($newDevice))
+			throw new Exception("Device cannot be empty string");
+		$this->_device = $newDevice;
+	} //setEmail
+    
     public function __toString() {
-        return __CLASS__ ."(id=$this->id, username=$this->username, password=$this->password, email=$this->email)";
+        return __CLASS__ ."(id=$this->id, username=$this->username, password=$this->password, email=$this->email, device=$this->device)";
     } // __toString
 
 } // class User
