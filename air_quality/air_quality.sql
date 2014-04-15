@@ -22,15 +22,10 @@ CREATE TABLE user(
     username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
+    deviceId VARCHAR(255) NOT NULL.
     PRIMARY KEY (id),
-    UNIQUE KEY (username)
-);
-
-CREATE TABLE device(
-    id VARCHAR(255) NOT NULL,
-    userId INT NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY(userId) REFERENCES user(id)
+    UNIQUE KEY (username),
+    UNIQUTE KEY (deviceId)
 );
 
 CREATE TABLE loginSession(
