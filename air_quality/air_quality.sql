@@ -24,8 +24,7 @@ CREATE TABLE user(
     email VARCHAR(255) NOT NULL,
     deviceId VARCHAR(255) NOT NULL.
     PRIMARY KEY (id),
-    UNIQUE KEY (username),
-    UNIQUTE KEY (deviceId)
+    UNIQUE KEY (username)
 );
 
 CREATE TABLE loginSession(
