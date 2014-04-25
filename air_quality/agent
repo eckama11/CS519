@@ -5,38 +5,16 @@ function httpPostInsert(data, url) {
     return response;
 }
 
-/*
-device.on("pressure", function(data) {
-    local response = httpPostInsert(data, "http://138.49.196.13/ci/index.php/site/addpressure?data=" + data);
-    server.log("respone body: " + response.body);
-});
-*/
-
-device.on("altitude", function(data) {
-    local response = httpPostInsert("", "http://138.49.196.13/ci/index.php/site/addaltitude?data=" + data);
-    server.log("respone body: " + response.body);
-});
-
-device.on("temperature", function(data) {
-    local response = httpPostInsert("", "http://138.49.196.13/ci/index.php/site/addtemperature?data=" + data);
-    server.log("respone body: " + response.body);
-});
-
-device.on("humidity", function(data) {
-    local response = httpPostInsert("", "http://138.49.196.13/ci/index.php/site/addhumidity?data=" + data);
+device.on("everything", function(data) {
+    local response = httpPostInsert(data, "http://138.49.196.13/ci/index.php/site/add?data=" + data);
     server.log("respone body: " + response.body);
 });
 
 /*
-device.on("dust", function(data) {
-    local response = httpPostInsert(data, "http://138.49.196.13/ci/index.php/site/adddust?data=" + data);
+device.on("logData", function(data) {
+    local response = httpPostInsert(data, "http://138.49.196.17/CS519/data.php");
     server.log("respone body: " + response.body);
 });
 */
 
-/*
-device.on("GPS", function(data) {
-    local response = httpPostInsert(data, "http://138.49.196.13/ci/index.php/site/addgps?data=" + data);
-    server.log("respone body: " + response.body);
-});
-*/
+
