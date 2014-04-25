@@ -1,0 +1,13 @@
+Partlist exported from /Users/ASE/School/Spring_2014/CS_519/EAGLE/project/air_quality.sch at 4/25/14 12:49 PM
+
+Part Value              Device             Package     Description                          
+C3   220uF 16V .248 dia CPOL-US153CLV-0605 153CLV-0605 POLARIZED CAPACITOR, American symbol 
+IC1  LPS331AP           LPS331AP           HCLGA-16L                                        
+JP1  M09                M09                1X09        Header 9                             
+JP2  M12LOCK            M12LOCK            1X12_LOCK   Header 12                            
+JP3                     M06LOCK            1X06_LOCK   Header 6                             
+R1   150Ohm             RESISTOR0402-RES   0402-RES    Resistor                             
+R2   4.7KOhm            RESISTOR0402-RES   0402-RES    Resistor                             
+R3   4.7KOhm            RESISTOR0402-RES   0402-RES    Resistor                             
+R4   4.7KOhm            RESISTOR0402-RES   0402-RES    Resistor                             
+U1   HTU21DSMD          HTU21DSMD          HTU21D                                           
