@@ -2,26 +2,25 @@
 //GTPA013 with pins5,7
 gpsline<-"";
 gpsToServer<-"";
+lat<-"";
+lon<-"";
+voMeasured<-"";
 constant<- gpsline;
 //paANDth 
 paANDth<-"";
-//configure altitude sensor
-hardware.i2c12.configure(CLOCK_SPEED_400_KHZ);
-//configure humidity/temp sensor
+//configure humidity/temp sensor & altitude sensor
 hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
 
 //using to replace ,, || , with something else
 function StringReplace(string, original, replacement)
 {
   // make a regexp that will match the substring to be replaced
-  //
   local expression = regexp(original);
 
   local result = "";
   local position = 0;
 
   // find the first match
-  //
   local captures = expression.capture(string);
 
   while (captures != null)
@@ -37,12 +36,10 @@ function StringReplace(string, original, replacement)
     }
 
     // find the next match
-    //
     captures = expression.capture(string, position);
   }
 
   // add any remaining part of the string after the last match
-  //
   result += string.slice(position);
 
   return result;
@@ -54,10 +51,8 @@ function gpsData() {
   while(b != -1) {
     if (b < 32) {
       if (gpsline.len() > 0) {
-        //server.log("GPS line: "+ gpsline);
         local ex = regexp("[$]GPRMC.+");
         local pi = ex.match(gpsline);
-        //server.log(pi);
         if (ex.match(gpsline)) {
           local string = gpsline;
           string = StringReplace(string, ",,", ",>,");
@@ -66,6 +61,8 @@ function gpsData() {
           local sp = split(string, ",");
           server.log(sp[3] + "_" + sp[4] + "_" + sp[5] + "_" + sp[6]);
           gpsToServer = sp[3] + "_" + sp[4] + "_" + sp[5] + "_" + sp[6];
+          lat = sp[3] + "_" + sp[4];
+          lon = sp[5] + "_" + sp[6];
           hardware.uart57.disable();
           //agent.send("GPS", gpsToServer);
           return;
@@ -81,7 +78,7 @@ function gpsData() {
 
 function readPressureInchesGH() {
   local a = (0x5d << 1);
-  local press = hardware.i2c12.read(a, "\xa8", 3);
+  local press = hardware.i2c89.read(a, "\xa8", 3);
   local pressure = (press[2] << 16) + (press[1] << 8) + (press[0]);
   //2's compliment if the number is negative
   if (0x800000 & pressure) pressure = -(0x1000000-pressure);
@@ -103,12 +100,59 @@ function pressureToAltitudeFeet(pressureA, stanPres) {
   return altitude;
 }
 
+function particles() {
+  //make shorter pin5 name
+  local pin5 = hardware.pin5;
+  //make shorter pin1 name
+  local pin1 = hardware.pin1;
+
+  //configure pin5 to turn on/off led
+  //led is used to sense dust particles
+  pin5.configure(DIGITAL_OUT);
+  //configure pin1 to read voltage
+  //of dust sensor, will later involve
+  //algorithm to calculate dust density
+  pin1.configure(ANALOG_IN);
+
+  //turn led on
+  pin5.write(0);
+  //take time to sample
+  imp.sleep(0.0000028);
+  //read dust value
+  voMeasured = pin1.read();
+  //take some more delay time
+  imp.sleep(0.00000040);
+  //turn led off
+  pin5.write(1);
+  //take some more delay time
+  imp.sleep(0.00009680);
+
+  //this portion takes it from 
+  //raw number to dustDensity
+
+  //0-3.3V mapped to 0-65,535 integer value
+  //recover voltage based in slope intercept
+  //of voltage versus reading
+  local calcVoltage = (2.7/65535)*voMeasured + 0.6;
+  //recover dust density based on slope intercept
+  //of dust density versus voltage given in 
+  //Sharp's datasheet via sparkfun
+  local dustDensity = (calcVoltage - 0.6)/6.0;
+
+  //log answer
+  server.log("Raw Signal Value (0-65,535): " + voMeasured);
+  server.log("Voltage: " + calcVoltage);
+  server.log("Dust Density: " + dustDensity);
+  //local str = format("str1=%d", voMeasured);
+  //agent.send("logData", str);
+}
+
 //funtion sends pressure, altitue
 //function to read pressure, altitude, temp
 function readPATH() {
   local a = (0x5d << 1);
   //turn sensor on
-  hardware.i2c12.write(a,"\x20\xe0");
+  hardware.i2c89.write(a,"\x20\xe0");
   //wait .5 seconds
   imp.sleep(0.5);
   //do work of getting pressure
@@ -116,7 +160,7 @@ function readPATH() {
   //do work of getting altitude
   local altitude = pressureToAltitudeFeet(pressureA, 29.9213);
   //turn sensor off
-  hardware.i2c12.write(a,"\x20\x00");
+  hardware.i2c89.write(a,"\x20\x00");
   //reading temperature and humidity
   local alsAddr = 0x40;
   //write to temp sensor
@@ -141,28 +185,23 @@ function readPATH() {
   server.log("altitude: " + altitude + " ft");
   server.log("temp: " + newTemp);
   server.log("humidity: " + newHum);
-  //agent.send("pressure", pressureA);
-  agent.send("altitude", altitude);
-  agent.send("temperature", newTemp);
-  agent.send("humidity", newHum);
+  local gpsToServer;
+  //local everything = newTemp + "_" + altitude + "_" + newHum + "_" + pressureA + "_" + 43.81 + "_" + -91.23 + "_" + voMeasured + "_" + "1";
+  local everything = newTemp + "_" + altitude + "_" + newHum + "_" + pressureA + "_" + 43.81 + "_" + -91.23 + "_" + "1";
+  //local str = format("newTemp=%f&altitude=%f&newHum=%f&pressureA=%f&latitude=%f&longitude=%f&particles=%f&imp=%s",
+   //                    newTemp, altitude, newHum, pressureA, 43.81, -91.23, 2222,"235960eb6e493ee");
+  //agent.send("logData",str);
+  agent.send("everything", everything);
 }
-
-//pressure function called
-//function start(ledState) {
-  //local count = 0;
-  //readPATH();
-  //configure hardware
-  //read out gps data
- // hardware.uart57.configure(9600, 8, PARITY_NONE, 1, NO_CTSRTS, gpsData);
-//}
 
 function start() {
   local count = 0;
+  particles();
   readPATH();
   //configure hardware
   //read out gps data
   hardware.uart57.configure(9600, 8, PARITY_NONE, 1, NO_CTSRTS, gpsData);
-  imp.wakeup(1, start);
+  imp.wakeup(900, start);
 }
 //Main Execution loop
 function loop() {
