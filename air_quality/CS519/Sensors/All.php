@@ -1,1 +1,0 @@
-This is the page with ALL sensors

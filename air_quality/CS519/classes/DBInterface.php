@@ -115,7 +115,7 @@ class DBInterface {
         // Generate a new session ID
         // This may be somewhat predictable, but should be strong enough for purposes of the demo
         $sessionId = md5(uniqid(microtime()) . $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT']);
-		 
+/*----------*/		 
         $rv = new LoginSession( $sessionId, $this->readUser($authenticatedUser) );
 		//if(true)
 		//	throw new Exception($this->formatErrorMessage($loginStmt, "Here"));
@@ -188,7 +188,7 @@ class DBInterface {
         static $stmt;
         if ($stmt == null)
             $stmt = $this->dbh->prepare(
-                   "SELECT id, username, password, email ".
+                   "SELECT id, username, password, email, device ".
                         "FROM user ".
                         "WHERE id = ?"
                 );
@@ -201,12 +201,15 @@ class DBInterface {
         $row = $stmt->fetchObject();
         if ($row === false)
             throw new Exception("No such User: $id");
-		
+		if ($row->device == null)
+			throw new Exception("No device being passed.");
+			
         return new User(
                 $row->id,
                 $row->username,
                 $row->password,
-                $row->email
+                $row->email,
+                $row->device
             );
             if(true)
             	throw new Exception($this->formatErrorMessage($loginStmt, "Here"));
@@ -221,7 +224,7 @@ class DBInterface {
         static $stmt;
         if ($stmt == null)
             $stmt = $this->dbh->prepare(
-                    "SELECT id, username, password, email, deviceId ".
+                    "SELECT id, username, password, email, device ".
                         "FROM user ".
                         "ORDER BY username"
                 );
@@ -257,7 +260,7 @@ class DBInterface {
         if ($stmtInsert == null) {
             $stmtInsert = $this->dbh->prepare(
                     "INSERT INTO user ( ".
-                            "username, password, email, deviceId".
+                            "username, password, email, device".
                         ") VALUES ( ".
                             ":username, :password, :email, :device".
                         ")"
@@ -308,5 +311,67 @@ class DBInterface {
                 $user->device
             );
     } // writeUser
+
+	/**
+     * Writes a Sensor to the database.
+     * @param   Sensor    $sensor   The sensor to write.  If the id property is 0, a new
+     *                                  record will be created, otherwise an existing record matching
+     *                                  the id will be updated.
+     * @return  Sensor    A new Sensor instance (with the new id if a new record was created).
+     */
+    public function writeSensor( Sensor $sensor ) {
+        static $stmtInsert;
+        if ($stmtInsert == null) {
+            $stmtInsert = $this->dbh->prepare(
+                    "INSERT INTO sensors ( ".
+                            "impId,timeInfo,temperature,humidity,pressure,altitude,latitude,longitude,particles".
+                        ") VALUES ( ".
+                            ":impId, :timeInfo, :temperature, :humidity, :pressure, :altitude, :latitude, :longitude, :particles".
+                        ")"
+                );
+
+            if (!$stmtInsert)
+                throw new Exception($this->formatErrorMessage(null, "Unable to prepare sensor insert"));
+
+        }
+
+        $params = Array(
+        		':impId' => $sensor->impId,
+                ':timeInfo' => $sensor->timeInfo,
+                ':temperature' => $sensor->temperature,
+                ':humidity' => $sensor->humidity,
+                ':pressure' => $sensor->pressure,
+                ':altitude' => $sensor->altitude,
+                ':latitude' => $sensor->latitude,
+                ':longitude' => $sensor->longitude,
+                ':particles' => $sensor->particles
+            );
+
+        $stmt = $stmtInsert;
+
+        $success = $stmt->execute($params);
+
+        if ($success == false)
+            throw new Exception($this->formatErrorMessage($stmt, "Unable to store reading record in database"));
+
+        if ($sensor->id == 0)
+            $newId = $this->dbh->lastInsertId();
+        else
+            $newId = $sensor->id;
+ 
+        return new Sensor(
+                $newId,
+                $sensor->impId,
+            	$sensor->timeInfo,
+                $sensor->temperature,
+                $sensor->humidity,
+                $sensor->pressure,
+                $sensor->altitude,
+                $sensor->latitude,
+                $sensor->longitude,
+                $sensor->particles
+            );
+    } // writeSensor
+    
 
 } // DBInterface

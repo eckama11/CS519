@@ -78,7 +78,9 @@ function doLogin(form) {
 	<body>
 		<div class="navbar navbar-inverse navbar-static-top">
 			<div class="container">
-				<a href="index.php" class="navbar-brand">Air Quality</a>
+				<a href="index.php" class="navbar-brand">
+				<span class="glyphicon glyphicon-cloud"></span>
+				Air Quality</a>
 				<button class="navbar-toggle" data-toggle="collapse" data-target=".navHeaderCollapse">
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>

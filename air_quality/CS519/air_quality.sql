@@ -3,47 +3,35 @@ DROP DATABASE IF EXISTS air_quality;
 CREATE DATABASE air_quality;
 USE air_quality;
 
-CREATE TABLE temperature(
+Create TABLE sensors(
     id INT NOT NULL AUTO_INCREMENT,
-    temperature DECIMAL(3,2) NOT NULL,
+    impId INT NOT NULL,
     timeInfo DATETIME NOT NULL,
+    temperature FLOAT NOT NULL,
+    humidity FLOAT NOT NULL,
+    pressure FLOAT NOT NULL,
+    altitude FLOAT NOT NULL,
+    latitude FLOAT NOT NULL,
+    longitude FLOAT NOT NULL,
+    particles FLOAT NOT NULL,
     PRIMARY KEY (id)
 );
 
-CREATE TABLE humidity(
+CREATE TABLE user(
     id INT NOT NULL AUTO_INCREMENT,
-    humidity DECIMAL(3,2) NOT NULL,
-    timeInfo DATETIME NOT NULL,
-    PRIMARY KEY (id)
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    deviceId VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY username_deviceId(username, deviceId)
 );
 
-CREATE TABLE pressure(
-    id INT NOT NULL AUTO_INCREMENT,
-    pressure DECIMAL(3,2) NOT NULL,
-    timeInfo DATETIME NOT NULL,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE altitude(
-    id INT NOT NULL AUTO_INCREMENT,
-    altitude DECIMAL(3,2) NOT NULL,
-    timeInfo DATETIME NOT NULL,
-    PRIMARY KEY (id)
-);
-
-
-CREATE TABLE sensorGPS(
-    id INT NOT NULL AUTO_INCREMENT,
-    latitude DECIMAL(7,7) NOT NULL,
-    longitude DECIMAL(7,7) NOT NULL,
-    timeInfo DATETIME NOT NULL,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE sensorParticle(
-    id INT NOT NULL AUTO_INCREMENT,
-    timeInfo DATETIME NOT NULL,
-    PRIMARY KEY (id)
+CREATE TABLE loginSession(
+    sessionId VARCHAR(255) NOT NULL,
+    authenticatedUser INT NOT NULL,
+    PRIMARY KEY(sessionID),
+    FOREIGN KEY(authenticatedUser) REFERENCES user(id)
 );
 
 -- Create the user which the app will use to connect to the DB

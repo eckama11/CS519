@@ -62,19 +62,16 @@ if (isset($loginSession))
 					"dataType" : "json"
 					})
 					.done(function(data) {
+            			$("#spinner").hide();
 						if (data.error != null) {
-							$("#spinner").hide();
-							showError(data.error);
-							$(form.elements.password).val('');
-							$("#loginDiv").show();
-						} else
-							$("#spinner").hide();
-							$("#successDiv").show();
-					})
+                			showError(data.error);
+                			$("#content").show();
+            			} else
+                			$("#successDiv").show();
+        			})
 					.fail(function( jqXHR, textStatus, errorThrown ) {
 						console.log("Error: "+ textStatus +" (errorThrown="+ errorThrown +")");
 						console.log(jqXHR);
-
 						$("#spinner").hide();
 						$("#loginDiv").show();
 						showError("Request failed, unable to login: "+ errorThrown);

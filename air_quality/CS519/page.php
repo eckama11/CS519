@@ -54,7 +54,7 @@ function showError(message) {
 				</button>
 				<div class="collapse navbar-collapse navHeaderCollapse">
 					<ul class="nav navbar-nav navbar-right">
-						<li><a href="page.php/addDevice">Add Device</a></li>
+						<li><a href="page.php/Data">Sensor Reading</a></li>
 						<li><a href="page.php/Pass">Password Reset</a></li>
 						<li><a href="logout.php">Logout</a></li>
 					</ul>
