@@ -271,7 +271,10 @@ class DBInterface {
 
             $stmtUpdate = $this->dbh->prepare(
                     "UPDATE user SET ".
-                            "password = :password, email = :email, device = :device ".
+                            "username = :username,
+                             password = :password, 
+                             email = :email, 
+                             device = :device".
                         "WHERE id = :id"
                 );
 
